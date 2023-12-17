@@ -1,0 +1,211 @@
+# Parameters for api-chart chart.
+
+fullnameOverride:
+  type: String
+  describe: |
+    We do not need rename name's chart of metadata in every files.
+    Just override this variable.
+  value: <NAME_OF_CHART>
+
+app:
+  type: Dictionaries
+  describe: Declare metadata variables of application.
+  value:
+    env:
+      type: String
+      describe: Environment of application.
+      value: <NAME_OF_ENVIRONMENT>
+    platform:
+      type: String
+      describe: Platform of application.
+      value: <NAME_OF_PLATFORM>
+
+deployment:
+  type: Dictionaries
+  describe: Declare metadata variables of deployment.
+  value:
+    containers:
+      type: Dictionaries
+      describe: Declare metadata variables of containers.
+      value:
+        app:
+          type: Dictionaries
+          describe: Declare variables that do need to init the container.
+          value:
+            enabled:
+              type: Boolean
+              describe: Permit to use this container.
+              value: <ENABLED_FLAG>
+            image:
+              type: Dictionaries
+              describe: Describe information of image in container to pull it.
+              value:
+                repository:
+                  type: String
+                  describe: Repository of image.
+                  value: <REPOSITORY_OF_IMAGE>
+                tag:
+                  type: String
+                  describe: Tag of image to pull.
+                  value: <TAG_OF_IMAGE>
+                pullPolicy:
+                  type: String
+                  describe: Policy to pull image in k8s.
+                  value: <RULE_PULL_POLICY>
+            ports:
+              type: Array
+              describe: Ports to expose of container.
+              value:
+                - name:
+                    type: String
+                    describe: Name of port config.
+                    value: <NAME_OF_PORT_CONFIG>
+                  containerPort:
+                    type: Number
+                    describe: Ports to expose of container.
+                    value: <NUMBER_PORT>
+                  protocol:
+                    type: String
+                    describe: Type of protocol.
+                    value: <TYPE_PROTOCOL>
+          envs:
+            type: Dictionaries
+            describe: List of environment of the container.
+            value:
+              gitCommitId:
+                type: String
+                describe: Full commit id of this container.
+                value: <GIT_COMMIT_ID>
+              gitShortCommitId:
+                type: String
+                describe: Short commit id of this container.
+                value: <SHORT_GIT_COMMIT_ID>
+              pipelineName:
+                type: String
+                describe: Pipeline to build this container.
+                value: <NAME_OF_PIPELINE>
+              buildNumber:
+                type: String
+                describe: Build number of pipeline to build this container.
+                value: <BUILD_NUMBER_OF_PIPELINE>
+              opts:
+                type: Array Of Dictionaries
+                describe: Optional other environments.
+                value:
+                  - name:
+                      type: String
+                      describe: Name of environment.
+                      value: <ENVIRONMENT_NAME>
+                    value:
+                      type: String
+                      describe: Value of environment.
+                      value: <ENVIRONMENT_VALUE>
+          healthCheck:
+            enabled:
+              type: Boolean
+              describe: Permit to use the health check.
+              value: <ENABLED_FLAG>
+            livenessProbePath:
+              type: String
+              describe: |
+                Url to check the container is still alive.
+                Necessary when restart the container to avoid problems as the deadlock that
+                  the container is still alive but hanging forever.
+                Usually we call the health check url of application if it has.
+              value: <URL_INSIDE_CONTAINER>
+            readinessProbePath:
+              type: String
+              describe: |
+                Url to check the container is ready to run (can receive traffics into it).
+                Necessary when init the container.
+                Usually we call the health check url of application if it has.
+              value: <URL_INSIDE_CONTAINER>
+          volumeMounts:
+            type: Array Of Dictionaries
+            describe: Number of items willing mount.
+            value:
+              - name:
+                  type: String
+                  describe: |
+                    Name of mount item.
+                    It must be match with names in the volumes config to bind each other.
+                  value: <NAME_OF_MOUNT>
+                mountPath:
+                  type: String
+                  describe: |
+                    Path of the item (folder or file) willing mount in container (source path).
+                    Example: /mnt/any.txt
+                  value: <PATH_OF_FILE>
+                subPath:
+                  type: String
+                  describe: |
+                    Path of the item (folder or file) when is outside (target path).
+                    Example: <FOLDER_NAME>/<DATE>/any.txt
+                  value: <PATH_OF_FILE>
+    volumes:
+      type: Array Of Dictionaries
+      describe: Number of corresponding items mapping with volume mounts.
+      value:
+        - name:
+            type: String
+            describe: |
+              Name of volume item.
+              It must be match with names in the volumeMounts config to bind each other.
+            value: <NAME_OF_VOLUME>
+          configMap:
+            name:
+              type: String
+              describe: Name of configmap
+              value: <NAME_OF_CONFIGMAP>
+
+configMap:
+  type: Dictionaries
+  describe: |
+    Config for configmap where mount content of file that do not need secure.
+  value:
+    enabled:
+      type: Boolean
+      describe: |
+        Permit to use the configmap.
+      value: <ENABLED_FLAG>
+    items:
+      type: Array Of Dictionaries
+      describe: Number of items was mapped by configmap.
+      value:
+        - name:
+            type: String
+            describe: Name of item.
+            value: <ITEM_NAME>
+          content:
+            type: String
+            describe: Content of item.
+            value: <ITEM_CONTENT>
+
+secret:
+  type: Dictionaries
+  describe: |
+    Config for secret in configs that do need secure.
+  value:
+    enabled:
+      type: Boolean
+      describe: |
+        Permit to use the secret.
+      value: <ENABLED_FLAG>
+    items:
+      type: Array Of Dictionaries
+      describe: Number of items was mapped by secret.
+      value:
+        - name:
+            type: String
+            describe: Name of item.
+            value: <ITEM_NAME>
+          content:
+            type: String
+            describe: Content of item.
+            value: <ITEM_CONTENT_BASE64>
+
+imagePullSecrets:
+  type: Array
+  describe: Declare credentials to access the private hub.
+  value:
+    - name: <NAME_OF_SECRET_ACCESS_DOCKER_PRIVATE_HUB>
